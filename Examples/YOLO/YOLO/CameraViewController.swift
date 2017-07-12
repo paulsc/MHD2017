@@ -31,6 +31,8 @@ class CameraViewController: UIViewController {
   var boundingBoxes = [BoundingBox]()
   var colors: [UIColor] = []
 
+  let pacmanView = PacmanView()
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -104,6 +106,9 @@ class CameraViewController: UIViewController {
     
     socket.connect()
 
+    // add pacman
+    pacmanView.frame = view.bounds
+    view.addSubview(pacmanView)
   }
 
   override func didReceiveMemoryWarning() {
@@ -116,6 +121,12 @@ class CameraViewController: UIViewController {
   override func viewWillLayoutSubviews() {
     super.viewWillLayoutSubviews()
     resizePreviewLayer()
+  }
+
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+
+    pacmanView.animatePacman()
   }
 
   override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -222,4 +233,128 @@ extension CameraViewController: VideoCaptureDelegate {
   func videoCapture(_ capture: VideoCapture, didCapturePhotoTexture texture: MTLTexture?, previewImage: UIImage?) {
     // not implemented
   }
+}
+
+class PacmanView: UIView {
+
+    let ballLayer = CAShapeLayer()
+    let ballSize: CGFloat = 25
+
+    var segmentWidth: CGFloat {
+        return bounds.width / 4
+    }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+
+        configure()
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+
+    func configure() {
+
+        ballLayer.fillColor = UIColor.yellow.cgColor
+
+        let offset = (segmentWidth / 2) - (ballSize / 2)
+        let rect = CGRect(
+            x: offset,
+            y: 100,
+            width: ballSize,
+            height: ballSize)
+        ballLayer.frame = rect
+        ballLayer.path = pacmanPath().cgPath
+
+        layer.addSublayer(ballLayer)
+    }
+
+    @objc func animatePacman() {
+
+        let initialOffset = (segmentWidth / 2) - (ballSize / 2)
+
+        UIView.animate(
+        withDuration: 2.5) {
+
+            let x: CGFloat
+
+            if self.ballLayer.frame.origin.x > (self.bounds.width - self.segmentWidth) {
+                x = initialOffset
+            } else {
+                x = self.ballLayer.frame.origin.x + self.segmentWidth
+            }
+
+            self.ballLayer.frame = CGRect(
+                x: x,
+                y: 100,
+                width: self.ballSize,
+                height: self.ballSize)
+        }
+
+        perform(
+            #selector(PacmanView.animatePacman),
+            with: nil,
+            afterDelay: 1)
+    }
+
+    func pacmanPath() -> UIBezierPath {
+
+        //// Bezier 2 Drawing
+        let bezier2Path = UIBezierPath()
+        bezier2Path.move(to: CGPoint(x: 50.47, y: 5.69))
+        bezier2Path.addLine(to: CGPoint(x: 47.65, y: 5.69))
+        bezier2Path.addLine(to: CGPoint(x: 47.65, y: 8.41))
+        bezier2Path.addLine(to: CGPoint(x: 50.47, y: 8.41))
+        bezier2Path.addLine(to: CGPoint(x: 50.47, y: 5.69))
+        bezier2Path.close()
+        bezier2Path.move(to: CGPoint(x: 61.47, y: 0.41))
+        bezier2Path.addLine(to: CGPoint(x: 61.47, y: 3.04))
+        bezier2Path.addLine(to: CGPoint(x: 64.25, y: 3.04))
+        bezier2Path.addLine(to: CGPoint(x: 64.25, y: 5.93))
+        bezier2Path.addLine(to: CGPoint(x: 67.3, y: 5.93))
+        bezier2Path.addLine(to: CGPoint(x: 67.3, y: 8.56))
+        bezier2Path.addLine(to: CGPoint(x: 61.47, y: 8.56))
+        bezier2Path.addLine(to: CGPoint(x: 61.47, y: 11.34))
+        bezier2Path.addLine(to: CGPoint(x: 56.18, y: 11.34))
+        bezier2Path.addLine(to: CGPoint(x: 56.18, y: 13.75))
+        bezier2Path.addLine(to: CGPoint(x: 50.47, y: 13.75))
+        bezier2Path.addLine(to: CGPoint(x: 50.47, y: 16.53))
+        bezier2Path.addLine(to: CGPoint(x: 47.75, y: 16.48))
+        bezier2Path.addLine(to: CGPoint(x: 47.75, y: 19.31))
+        bezier2Path.addLine(to: CGPoint(x: 50.47, y: 19.15))
+        bezier2Path.addLine(to: CGPoint(x: 50.47, y: 21.87))
+        bezier2Path.addLine(to: CGPoint(x: 56.18, y: 21.87))
+        bezier2Path.addLine(to: CGPoint(x: 56.18, y: 24.65))
+        bezier2Path.addLine(to: CGPoint(x: 61.47, y: 24.65))
+        bezier2Path.addLine(to: CGPoint(x: 61.47, y: 27.37))
+        bezier2Path.addLine(to: CGPoint(x: 67.3, y: 27.37))
+        bezier2Path.addLine(to: CGPoint(x: 67.3, y: 30))
+        bezier2Path.addLine(to: CGPoint(x: 64.25, y: 30))
+        bezier2Path.addLine(to: CGPoint(x: 64.25, y: 32.78))
+        bezier2Path.addLine(to: CGPoint(x: 61.47, y: 32.78))
+        bezier2Path.addLine(to: CGPoint(x: 61.47, y: 35.56))
+        bezier2Path.addLine(to: CGPoint(x: 40.6, y: 35.61))
+        bezier2Path.addLine(to: CGPoint(x: 40.6, y: 32.78))
+        bezier2Path.addLine(to: CGPoint(x: 37.66, y: 32.78))
+        bezier2Path.addLine(to: CGPoint(x: 37.66, y: 30.25))
+        bezier2Path.addLine(to: CGPoint(x: 35.34, y: 30.25))
+        bezier2Path.addLine(to: CGPoint(x: 35.34, y: 27.48))
+        bezier2Path.addLine(to: CGPoint(x: 32.4, y: 27.48))
+        bezier2Path.addLine(to: CGPoint(x: 32.4, y: 8.96))
+        bezier2Path.addLine(to: CGPoint(x: 35.34, y: 8.96))
+        bezier2Path.addLine(to: CGPoint(x: 35.34, y: 6.23))
+        bezier2Path.addLine(to: CGPoint(x: 37.66, y: 6.23))
+        bezier2Path.addLine(to: CGPoint(x: 37.66, y: 3.1))
+        bezier2Path.addLine(to: CGPoint(x: 40.6, y: 3.1))
+        bezier2Path.addLine(to: CGPoint(x: 40.6, y: 0.41))
+        bezier2Path.addLine(to: CGPoint(x: 61.47, y: 0.41))
+        bezier2Path.addLine(to: CGPoint(x: 61.47, y: 0.41))
+        bezier2Path.close()
+        bezier2Path.fill()
+        bezier2Path.lineWidth = 1
+        bezier2Path.stroke()
+        
+        return bezier2Path
+    }
 }
