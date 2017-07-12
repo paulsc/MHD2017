@@ -30,6 +30,8 @@ class CameraViewController: UIViewController {
 
   var boundingBoxes = [BoundingBox]()
   var colors: [UIColor] = []
+    
+  var socket = SocketIOClient(socketURL: URL(string: "http://192.168.1.131:3000")!, config: [.log(false), .compress])
 
   let pacmanView = PacmanView()
 
@@ -96,7 +98,6 @@ class CameraViewController: UIViewController {
     }
     
     
-    let socket = SocketIOClient(socketURL: URL(string: "http://192.168.178.22:3000")!, config: [.log(false), .compress])
 
     socket.on(clientEvent: .connect) {data, ack in
         print("socket connected")
@@ -170,6 +171,51 @@ class CameraViewController: UIViewController {
     runner.predict(network: network, texture: texture, queue: .main) { result in
       self.show(predictions: result.predictions)
 
+      var nr_steps = 4
+        var seq = [Bool]()
+        
+        for i in 0..<nr_steps {
+            seq.append(false)
+        }
+        
+      let width = 416
+      let segment_width:CGFloat = 416 / CGFloat(nr_steps)
+        
+      for i in 0..<result.predictions.count {
+            let prediction = result.predictions[i]
+        
+            let label = labels[prediction.classIndex]
+            if label != "bottle" {
+                continue
+            }
+        
+            let midX = prediction.rect.origin.x + prediction.rect.width * 0.5
+        
+            let seg_idx = Int(floor(midX / segment_width))
+            NSLog("\(label) score: \(prediction.score) SEG: \(seg_idx) x:\(midX)")
+
+            seq[seg_idx] = true
+        
+      }
+        
+      var seq_str = ""
+      for i in 0..<seq.count {
+        if (seq[i]) {
+            seq_str = seq_str + "x"
+        }
+        else {
+            seq_str = seq_str + "-"
+        }
+        
+      }
+        
+      NSLog(seq_str)
+        
+      
+      self.socket.emit("drum", seq)
+        
+
+        
       if let texture = result.debugTexture {
         self.debugImageView.image = UIImage.image(texture: texture)
       }
@@ -182,26 +228,32 @@ class CameraViewController: UIViewController {
       if i < predictions.count {
         let prediction = predictions[i]
         
-        if prediction.score < 0.7 {
+        if prediction.score < 0.6 {
             continue
         }
+        
+        //NSLog(NSStringFromCGRect(prediction.rect))
 
         // The predicted bounding box is in the coordinate space of the input
         // image, which is a square image of 416x416 pixels. We want to show it
         // on the video preview, which is as wide as the screen and has a 4:3
         // aspect ratio. The video preview also may be letterboxed at the top
         // and bottom.
-        let width = view.bounds.width
-        let height = width * 3 / 4
+        let height = view.bounds.height
+    
+        let width = height * (4/3)
+        NSLog("\(height) x \(width)")
         let scaleX = width / 416
         let scaleY = height / 416
-        let top = (view.bounds.height - height) / 2
+        //let top = (view.bounds.height - height) / 2
+        let left = (view.bounds.width - width) / 2
 
         // Translate and scale the rectangle to our own coordinate system.
         var rect = prediction.rect
         rect.origin.x *= scaleX
         rect.origin.y *= scaleY
-        rect.origin.y += top
+        //rect.origin.y += top
+        rect.origin.x += left
         rect.size.width *= scaleX
         rect.size.height *= scaleY
 
@@ -210,7 +262,6 @@ class CameraViewController: UIViewController {
         let color = colors[prediction.classIndex]
         boundingBoxes[i].show(frame: rect, label: label, color: color)
         
-        NSLog(label)
 
       } else {
         boundingBoxes[i].hide()
