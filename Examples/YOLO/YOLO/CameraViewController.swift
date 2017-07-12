@@ -110,6 +110,17 @@ class CameraViewController: UIViewController {
     // add pacman
     pacmanView.frame = view.bounds
     view.addSubview(pacmanView)
+    
+    let startButton = UIButton()
+    startButton.addTarget(self, action: #selector(CameraViewController.start), for: .touchUpInside)
+    startButton.setTitle("Start!", for: .normal)
+    startButton.frame = CGRect(x: view.bounds.width - 120, y: 20, width: 100, height: 20)
+    view.addSubview(startButton)
+  }
+    
+  @objc func start() {
+    pacmanView.animatePacman()
+    self.socket.emit("start", true)
   }
 
   override func didReceiveMemoryWarning() {
@@ -127,7 +138,7 @@ class CameraViewController: UIViewController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
 
-    pacmanView.animatePacman()
+//    pacmanView.animatePacman()
   }
 
   override var preferredStatusBarStyle: UIStatusBarStyle {
@@ -185,7 +196,7 @@ class CameraViewController: UIViewController {
             let prediction = result.predictions[i]
         
             let label = labels[prediction.classIndex]
-            if label != "bottle" {
+            if label != "person" {
                 continue
             }
         
@@ -290,9 +301,11 @@ class PacmanView: UIView {
 
     let ballLayer = CAShapeLayer()
     let ballSize: CGFloat = 25
+    
+    var currentStep = 1
 
     var segmentWidth: CGFloat {
-        return bounds.width / 4
+        return bounds.width / 5
     }
 
     override init(frame: CGRect) {
@@ -312,7 +325,7 @@ class PacmanView: UIView {
         let offset = (segmentWidth / 2) - (ballSize / 2)
         let rect = CGRect(
             x: offset,
-            y: 100,
+            y: 10,
             width: ballSize,
             height: ballSize)
         ballLayer.frame = rect
@@ -333,14 +346,20 @@ class PacmanView: UIView {
             if self.ballLayer.frame.origin.x > (self.bounds.width - self.segmentWidth) {
                 x = initialOffset
             } else {
-                x = self.ballLayer.frame.origin.x + self.segmentWidth
+                x = initialOffset + CGFloat(self.currentStep) * self.segmentWidth
             }
 
             self.ballLayer.frame = CGRect(
                 x: x,
-                y: 100,
+                y: 10,
                 width: self.ballSize,
                 height: self.ballSize)
+        }
+        
+        currentStep += 1
+        
+        if currentStep > 4 {
+            currentStep = 1
         }
 
         perform(
