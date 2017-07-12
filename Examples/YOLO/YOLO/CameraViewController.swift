@@ -92,6 +92,18 @@ class CameraViewController: UIViewController {
       // Once the NN is set up, we can start capturing live video.
       self.videoCapture.start()
     }
+    
+    
+    let socket = SocketIOClient(socketURL: URL(string: "http://192.168.178.22:3000")!, config: [.log(false), .compress])
+
+    socket.on(clientEvent: .connect) {data, ack in
+        print("socket connected")
+    }
+    
+    //socket.emit("update", ["amount": cur + 2.50])
+    
+    socket.connect()
+
   }
 
   override func didReceiveMemoryWarning() {
@@ -158,6 +170,10 @@ class CameraViewController: UIViewController {
     for i in 0..<boundingBoxes.count {
       if i < predictions.count {
         let prediction = predictions[i]
+        
+        if prediction.score < 0.7 {
+            continue
+        }
 
         // The predicted bounding box is in the coordinate space of the input
         // image, which is a square image of 416x416 pixels. We want to show it
@@ -165,7 +181,7 @@ class CameraViewController: UIViewController {
         // aspect ratio. The video preview also may be letterboxed at the top
         // and bottom.
         let width = view.bounds.width
-        let height = width * 4 / 3
+        let height = width * 3 / 4
         let scaleX = width / 416
         let scaleY = height / 416
         let top = (view.bounds.height - height) / 2
@@ -182,6 +198,8 @@ class CameraViewController: UIViewController {
         let label = String(format: "%@ %.1f", labels[prediction.classIndex], prediction.score * 100)
         let color = colors[prediction.classIndex]
         boundingBoxes[i].show(frame: rect, label: label, color: color)
+        
+        NSLog(label)
 
       } else {
         boundingBoxes[i].hide()

@@ -325,7 +325,7 @@
 				TargetAttributes = {
 					7B8237091EABDCE000127F0C = {
 						CreatedOnToolsVersion = 8.3;
-						DevelopmentTeam = MGCEKGP4Y4;
+						DevelopmentTeam = 8JAJ682HBR;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -546,11 +546,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = MGCEKGP4Y4;
+				DEVELOPMENT_TEAM = 8JAJ682HBR;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = MobileNets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.machinethink.MobileNets;
+				PRODUCT_BUNDLE_IDENTIFIER = net.llk.MobileNets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -562,11 +562,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = MGCEKGP4Y4;
+				DEVELOPMENT_TEAM = 8JAJ682HBR;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				INFOPLIST_FILE = MobileNets/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = net.machinethink.MobileNets;
+				PRODUCT_BUNDLE_IDENTIFIER = net.llk.MobileNets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
